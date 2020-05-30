@@ -150,7 +150,7 @@ def play(b, B):
 	n = 1
 	while n:
 		b.showBoard()
-		print(b.generateMoveStrings())
+		b.generateMoveStrings()
 		move = input("Enter move:")
 		#b.showBoard()
 		b.makeMove(move)
@@ -197,7 +197,7 @@ def play(b, B):
 
 W = Agent("white", 0.9, 0.9, 0.9)
 B = Agent("black", 0.9, 0.9, 0.9)
-W, B = train(50, W, B)
-print(B.eps)
+W, B = train(51, W, B)
+
 play(Board(), B)
 

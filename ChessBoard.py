@@ -13,7 +13,7 @@ class Board:
 	def generateMoveStrings(self):
 		moves= [] 
 		for move in self.board.legal_moves:
-			moves.append(move)
+			moves.append(str(move))
 		print(moves)
 
 	def showBoard(self):
