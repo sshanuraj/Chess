@@ -14,7 +14,7 @@ class Board:
 		moves= [] 
 		for move in self.board.legal_moves:
 			moves.append(str(move))
-		print(moves)
+		return moves
 
 	def showBoard(self):
 		print(self.board)
@@ -35,18 +35,4 @@ class Board:
 
 	def getBoardHash(self):
 		return self.board.fen()
-
-# b = Board()
-# b.resetBoard()
-# print(b.generateMoves())
-# b.makeMove("e2e4")
-# b.showBoard()
-# b.unMove()
-# b.resetBoard()
-# print(b.generateMoves())
-# b.makeMove("e2e4")
-# b.showBoard()
-# b.makeMove("e7e5")
-# b.showBoard()
-
 

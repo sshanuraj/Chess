@@ -1,6 +1,7 @@
 import numpy as np 
 import random
 from ChessBoard import Board, chess
+import pickle
 
 class Agent:
 	def __init__(self, color, eps, alpha, df):
@@ -71,6 +72,16 @@ class Agent:
 			board.makeMove(moves[random.randint(0, len(moves)-1)])
 			self.game_states.append(board.board.fen())
 
+	def saveStateValues(self):
+		f = open(self.color + "_state_values", "wb")
+		pickle.dump(self.state_value, f)
+		f.close()
+
+	def getStateValues(self):
+		f = open(self.color + "_state_values", "rb")
+		self.state_value = pickle.load(f)
+		f.close()
+
 def startGame(W, B, b):
 	while True:
 		W.makeMove(b)
@@ -118,49 +129,54 @@ def train(N, W, B):
 	bl = 0
 	d = 0
 	
-	b = Board()
 	for i in range(N):
+		b = Board()
 		#print("#####Game" + str(i + 1) + "#####")
 		res, W, B = startGame(W, B, b)
 		#print("#####Game" + str(i + 1) + " Over#####")
 
-		if i%10 == 0 and i != 0:
+		if i%400 == 0 and i != 0:
 			W.decayEps(0.75)
 			B.decayEps(0.75)
 
 		if res == 1:
-			print("### WHITE WON ###")
+			print("### WHITE WON GAME " + str(i+1) + " ###")
 			print()
 			w += 1
 		elif res == -1:
-			print("### BLACK WON ###")
+			print("### BLACK WON GAME " + str(i+1) + " ###")
 			print()
 			bl += 1
 		else:
-			print("### DRAW ###")
+			print("### DRAW GAME " + str(i+1) + " ###")
 			print()
 			d +=1
-		b.resetBoard()
 	print("White wins: " + str(w))
 	print("Black wins: " + str(bl))
 	print("Draws: " + str(d))
 	return W, B
 
-def play(b, B):
+def play(B):
 	n = 1
+	b = Board()
+	
 	while n:
 		b.showBoard()
-		b.generateMoveStrings()
-		move = input("Enter move:")
-		#b.showBoard()
-		b.makeMove(move)
+		moves = b.generateMoveStrings()
+		print(moves)
+		while True:
+			move = input("Enter move:")
+			#b.showBoard()
+			if move in moves:
+				b.makeMove(move)
+				break
 
 		if b.isCheckMate():
 			b.showBoard()
 			b.unMove()
 			B.getReward(0)
 			B.resetState()
-			b.resetBoard()
+			b = Board()
 			n = int(input("Play again (1/0) :"))
 			if n == 0:
 				break
@@ -174,7 +190,7 @@ def play(b, B):
 			W.resetState()
 			B.getReward(0.4)
 			B.resetState()
-			b.resetBoard()
+			b = Board()
 			n = int(input("Play again (1/0) :"))
 			if n == 0:
 				break
@@ -185,19 +201,28 @@ def play(b, B):
 			b.showBoard()
 			B.getReward(1)
 			B.resetState()
-			b.resetBoard()
+			b = Board()
 			n = int(input("Play again (1/0) :"))
 			
 		if b.isDraw():
 			b.showBoard()
 			B.getReward(0.4)
 			B.resetState()
-			b.resetBoard()
+			b = Board()
 			n = int(input("Play again (1/0) :"))
 
 W = Agent("white", 0.9, 0.9, 0.9)
-B = Agent("black", 0.9, 0.9, 0.9)
-W, B = train(51, W, B)
+B = Agent("black", 0.1, 0.9, 0.9)
 
-play(Board(), B)
+#train agent
+# W, B = train(2001, W, B)
+# B.saveStateValues()
+# W.saveStateValues()
+
+#play against a trained bot
+B.getStateValues()
+B.eps = 0.1
+print(len(B.state_value))
+play(B)
+#end 
 
