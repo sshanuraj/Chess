@@ -135,7 +135,7 @@ def train(N, W, B):
 		res, W, B = startGame(W, B, b)
 		#print("#####Game" + str(i + 1) + " Over#####")
 
-		if i%400 == 0 and i != 0:
+		if i%50 == 0 and i != 0:
 			W.decayEps(0.75)
 			B.decayEps(0.75)
 
@@ -159,7 +159,7 @@ def train(N, W, B):
 def play(B):
 	n = 1
 	b = Board()
-	
+
 	while n:
 		b.showBoard()
 		moves = b.generateMoveStrings()
@@ -211,13 +211,16 @@ def play(B):
 			b = Board()
 			n = int(input("Play again (1/0) :"))
 
-W = Agent("white", 0.9, 0.9, 0.9)
-B = Agent("black", 0.1, 0.9, 0.9)
+W = Agent("white", 0.2, 0.9, 0.9)
+B = Agent("black", 0.2, 0.9, 0.9)
 
 #train agent
-# W, B = train(2001, W, B)
+# W.getStateValues()
+# B.getStateValues()
+# W, B = train(301, W, B)
 # B.saveStateValues()
 # W.saveStateValues()
+#end
 
 #play against a trained bot
 B.getStateValues()
