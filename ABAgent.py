@@ -77,7 +77,7 @@ class GameTree:
 	def getOptimumValue(self, dep, color):
 		depth = 0
 		k = dep
-		newVal = -INF
+		newVal = NINF
 		curr = self.root
 		while self.root.val == NINF and curr != None:
 			if depth == k:
@@ -172,7 +172,7 @@ class ABAgent:
 			moveCnt = possibleMoves[0]
 		else:
 			moveCnt = possibleMoves[random.randint(0, len(possibleMoves)-1)]
-			
+
 		for move in legal_moves:
 			if cnt == moveCnt:
 				board.makeMove(move)
