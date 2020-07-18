@@ -49,11 +49,15 @@ class Node:
     	b = 0
     	dic = {1:1, 2:3, 3:3, 4:5, 5:9, 6:100}
 
-    	if self.game_state.board.is_checkmate() and colorMove == color:
+    	if self.game_state.isCheckMate() and colorMove == color:
     		self.val = MAXV
     		return None
-    	if self.game_state.board.is_checkmate() and colorMove != color:
+    	if self.game_state.isCheckMate() and colorMove != color:
     		self.val = MINV
+    		return None
+
+    	if self.game_state.isDraw():
+    		self.val = -1
     		return None
 
     	for i in range(64):
@@ -170,129 +174,123 @@ class ABAgent:
 				return
 			cnt += 1
 
-#desc : play both agents
-def startGame(W, B, b): #(white agent, black agent, board)
-	while True:
-		W.makeMoveUtil(b, 1)
-		b.showBoard()
+class Play:
+	def __init__(self, board):
+		self.board = board
 		
-		if b.isCheckMate():
-			print("White won.")
-			b.unMove()
-			return 1, W, B
-			
-		if b.isDraw():
-			print("Draw.")
-			b.unMove()
-			return 0, W, B
-
-		print()
-
-		B.makeMoveUtil(b, 1)
-		b.showBoard()
-		if b.isCheckMate():
-			print("Black won.")
-			return -1, W, B
-			
-		if b.isDraw():
-			print("Draw.")
-			return 0, W, B
-		print()
-
-def startGameTry(W, B, b):
-	while True:
-		W.makeMoveUtil(b, 2)
-		b.showBoard()
-		
-		if b.isCheckMate():
-			print("White won.")
-			b.unMove()
-			return 1, W, B
-			
-		if b.isDraw():
-			print("Draw.")
-			b.unMove()
-			return 0, W, B
-
-		print()
-		input()
-
-		B.makeMoveUtil(b, 2)
-		b.showBoard()
-		if b.isCheckMate():
-			print("Black won.")
-			return -1, W, B
-			
-		if b.isDraw():
-			print("Draw.")
-			return 0, W, B
-		print()
-		input()
-
-#desc: play against black		
-def play(B): #black agent
-	n = 1
-	b = Board()
-
-	while n:
-		b.showBoard()
-		moves = b.generateMoveStrings()
-		print(moves)
+	#desc : play both agents
+	def startGame(self, W, B): #(white agent, black agent, board)
 		while True:
-			move = input("Enter move:")
+			self.whiteMove(W)
+			
+			if self.board.isCheckMate():
+				print("White won.")
+				b.unMove()
+				return 1, W, B
+				
+			if self.board.isDraw():
+				print("Draw.")
+				b.unMove()
+				return 0, W, B
+
+			print()
+
+			self.blackMove(B)
+			if self.board.isCheckMate():
+				print("Black won.")
+				return -1, W, B
+				
+			if self.board.isDraw():
+				print("Draw.")
+				return 0, W, B
+			print()
+
+	def whiteMove(self, W):
+		W.makeMoveUtil(self.board, 3)
+		self.board.showBoard()
+		
+
+	def blackMove(self, B):
+		B.makeMoveUtil(self.board, 3)
+		self.board.showBoard()
+
+	def startGameTry(self, W, B, b):
+		while True:
+			W.makeMoveUtil(b, 4)
+			b.showBoard()
+			
+			if b.isCheckMate():
+				print("White won.")
+				b.unMove()
+				return 1, W, B
+				
+			if b.isDraw():
+				print("Draw.")
+				b.unMove()
+				return 0, W, B
+
+			print()
+		
+			B.makeMoveUtil(b, 2)
+			b.showBoard()
+			if b.isCheckMate():
+				print("Black won.")
+				return -1, W, B
+				
+			if b.isDraw():
+				print("Draw.")
+				return 0, W, B
+			print()
+
+	#desc: play against black		
+	def play(self, B): #black agent
+		n = 1
+		b = Board()
+
+		while n:
+			b.showBoard()
+			moves = b.generateMoveStrings()
+			print(moves)
+			while True:
+				move = input("Enter move:")
+				#b.showBoard()
+				if move in moves:
+					b.makeMove(move)
+					break
+
+			if b.isCheckMate():
+				b.showBoard()
+				b.unMove()
+				b = Board()
+				n = int(input("Play again (1/0) :"))
+				if n == 0:
+					break
+				else:
+					continue
+				
+			if b.isDraw():
+				b.showBoard()
+				b.unMove()
+				b = Board()
+				n = int(input("Play again (1/0) :"))
+				if n == 0:
+					break
+				
+			B.makeMoveUtil(b, 1)
 			#b.showBoard()
-			if move in moves:
-				b.makeMove(move)
-				break
+			if b.isCheckMate():
+				b.showBoard()
+				b = Board()
+				n = int(input("Play again (1/0) :"))
+				
+			if b.isDraw():
+				b.showBoard()
+				b = Board()
+				n = int(input("Play again (1/0) :"))
 
-		if b.isCheckMate():
-			b.showBoard()
-			b.unMove()
-			b = Board()
-			n = int(input("Play again (1/0) :"))
-			if n == 0:
-				break
-			else:
-				continue
-			
-		if b.isDraw():
-			b.showBoard()
-			b.unMove()
-			b = Board()
-			n = int(input("Play again (1/0) :"))
-			if n == 0:
-				break
-			
-		B.makeMoveUtil(b, 1)
-		#b.showBoard()
-		if b.isCheckMate():
-			b.showBoard()
-			b = Board()
-			n = int(input("Play again (1/0) :"))
-			
-		if b.isDraw():
-			b.showBoard()
-			b = Board()
-			n = int(input("Play again (1/0) :"))
+# b = Board()
+# B = ABAgent(BLACK)
+# W = ABAgent(WHITE)
+# p = Play(b)
+# p.startGame(W, B)
 
-b = Board()
-B = ABAgent(BLACK)
-W = ABAgent(WHITE)
-startGameTry(W, B, b)
-
-# for i in range(10):
-# 	print(b.generateMoveStrings())
-# 	move = input("Enter move:")
-# 	b.makeMove(move)
-# 	b.showBoard()
-# 	print()
-
-# 	print(b.generateMoveStrings())
-# 	move = input("Enter move:")
-# 	b.makeMove(move)
-# 	b.showBoard()
-# 	print()
-
-# 	root = Node(None, MAX, b)
-# 	print(root.evaluate(WHITE, WHITE))
-# 	print()
