@@ -18,6 +18,7 @@ class Chess:
 		piecesB = ["", "p", "n", "b", "r", "q", "k"]
 		textObject = self.gameEnv.screen.setTextSettings("Tahoma", 20)
 		self.gameEnv.screen.screenFill(self.gameEnv.BLACK)
+
 		for i in range(8):
 			if i%2 == 0:
 				x = 0
@@ -31,6 +32,7 @@ class Chess:
 				topLeftCoord = [x, y]
 				self.gameEnv.screen.getRectangle(dims, color, topLeftCoord)
 				x += 100
+
 		y = 412
 		for i in range(64):
 			if i%8 == 0:
@@ -49,7 +51,7 @@ class Chess:
 		while self.gameEnv.screen.con:
 			self.gameEnv.screen.checkGameQuitState()
 			if move%2 == 0:
-				self.start.whiteMove(self.w_agent)
+				self.start.whiteMove(self.w_agent, 3)
 
 				if self.board.isCheckMate():
 					print("White won.")
@@ -62,7 +64,7 @@ class Chess:
 					self.gameEnv.screen.endScreen()
 				self.setBoard()
 			else:
-				self.start.blackMove(self.b_agent)
+				self.start.blackMove(self.b_agent, 3)
 				if self.board.isCheckMate():
 					print("Black won.")
 					b.unMove()

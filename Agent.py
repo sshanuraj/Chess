@@ -222,10 +222,10 @@ B = Agent("black", 0.2, 0.9, 0.9)
 # W.saveStateValues()
 #end
 
-#play against a trained bot
-B.getStateValues()
-B.eps = 0.1
-print(len(B.state_value))
-play(B)
-#end 
+# #play against a trained bot
+# B.getStateValues()
+# B.eps = 0.1
+# print(len(B.state_value))
+# play(B)
+# #end 
 

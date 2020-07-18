@@ -10,8 +10,8 @@ BLACK = 0
 MIN = 0
 MAX = 1
 
-MINVAL = 10000
-MAXVAL = -10000
+INF = 100000
+NINF = -100000
 
 MAXV = 1000
 MINV = -1000
@@ -28,18 +28,18 @@ chess.KING: chess.PieceType= 6
 
 class Node:
     def __init__(self, parent, m, game_state):
-        self.val = MAXVAL
-        self.alpha = MAXVAL
-        self.beta = MINVAL
+        self.val = NINF
+        self.alpha = NINF
+        self.beta = INF
         self.game_state = game_state
         self.children = []
         self.agent = m
         self.parent = parent
 
     def resetValues(self):
-    	self.val = MAXVAL
-    	self.alpha = MAXVAL
-    	self.beta = MINVAL
+    	self.val = NINF
+    	self.alpha = NINF
+    	self.beta = INF
     	self.children = []
     	self.agent = MAX
     	self.parent = None
@@ -77,9 +77,9 @@ class GameTree:
 	def getOptimumValue(self, dep, color):
 		depth = 0
 		k = dep
-		newVal = MAXVAL
+		newVal = -INF
 		curr = self.root
-		while self.root.val == MAXVAL and curr != None:
+		while self.root.val == NINF and curr != None:
 			if depth == k:
 				if depth%2 == 1:
 					curr.evaluate(color, color)
@@ -91,7 +91,7 @@ class GameTree:
 				curr = curr.parent
 				continue
 
-			if newVal > MAXVAL:
+			if newVal > NINF:
 				if curr.agent == MIN:
 					if newVal < curr.beta and len(curr.children) > 1:
 						curr.beta = newVal
@@ -102,7 +102,7 @@ class GameTree:
 						curr.alpha = newVal
 					elif len(curr.children) == 1:
 						curr.alpha = newVal
-				newVal = MAXVAL
+				newVal = NINF
 
 			if curr.alpha >= curr.beta:
 				if curr.agent == MIN:
@@ -112,6 +112,7 @@ class GameTree:
 				depth -= 1
 				newVal = curr.val
 				curr = curr.parent
+
 			else:
 				l = len(curr.children)
 				cboard = copy.deepcopy(curr.game_state)
@@ -154,20 +155,24 @@ class ABAgent:
 		legal_moves = board.generateMoves()
 		cboard = copy.deepcopy(board)
 		root = Node(None, MAX, cboard)
+
 		self.gt = GameTree(root)
 		val = self.gt.getOptimumValue(depth, self.color)
 		possibleMoves = []
 		moveNum = 0
+
 		for i in self.gt.root.children:
 			if val == i.val:
 				possibleMoves.append(moveNum)
 			moveNum += 1
 		moveCnt = 0
 		cnt = 0
+
 		if len(possibleMoves) == 1:
 			moveCnt = possibleMoves[0]
 		else:
 			moveCnt = possibleMoves[random.randint(0, len(possibleMoves)-1)]
+			
 		for move in legal_moves:
 			if cnt == moveCnt:
 				board.makeMove(move)
@@ -205,13 +210,13 @@ class Play:
 				return 0, W, B
 			print()
 
-	def whiteMove(self, W):
-		W.makeMoveUtil(self.board, 3)
+	def whiteMove(self, W, dep):
+		W.makeMoveUtil(self.board, dep)
 		self.board.showBoard()
 		
 
-	def blackMove(self, B):
-		B.makeMoveUtil(self.board, 3)
+	def blackMove(self, B, dep):
+		B.makeMoveUtil(self.board, dep)
 		self.board.showBoard()
 
 	def startGameTry(self, W, B, b):
