@@ -86,7 +86,7 @@ class GameTree:
 				else:
 					curr.evaluate(color, 1 - color)
 				newVal = curr.val
-				# print(newVal)
+				
 				depth -= 1
 				curr = curr.parent
 				continue
