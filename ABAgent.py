@@ -268,7 +268,7 @@ class Play:
 			print()
 
 	#desc: play against black		
-	def play(self, B): #black agent
+	def play(self, B): 
 		n = 1
 		b = Board()
 
