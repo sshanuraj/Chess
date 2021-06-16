@@ -171,20 +171,6 @@ class ABAgent:
 		val, possibleMoves = self.gt.getOptimumValue(depth, self.color)
 		moveNum = 0
 
-		###checking code
-		# print(len(self.gt.root.children))
-		# print("Game state values:\n")
-		# k = 1
-		# for i in self.gt.root.children:
-		# 	print(str(k)+" Move:")
-		# 	i.game_state.showBoard()
-		# 	print(i.val)
-		# 	print()
-		# 	k = k + 1
-		# print("Game state values over.\n")
-		# input()
-		##end check code
-
 		if len(possibleMoves) == 1:
 			moveCnt = possibleMoves[0]
 		else:
