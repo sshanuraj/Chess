@@ -51,7 +51,7 @@ class Chess:
 		while self.gameEnv.screen.con:
 			self.gameEnv.screen.checkGameQuitState()
 			if move%2 == 0:
-				self.start.whiteMove(self.w_agent, 3)
+				self.start.whiteMove(self.w_agent, 4)
 
 				if self.board.isCheckMate():
 					print("White won.")
@@ -64,7 +64,7 @@ class Chess:
 					self.gameEnv.screen.endScreen()
 				self.setBoard()
 			else:
-				self.start.blackMove(self.b_agent, 3)
+				self.start.blackMove(self.b_agent, 4)
 				if self.board.isCheckMate():
 					print("Black won.")
 					b.unMove()

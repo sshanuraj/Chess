@@ -34,6 +34,7 @@ class Node:
         self.game_state = game_state
         self.children = []
         self.agent = m
+        self.moves = []
         self.parent = parent
 
     def resetValues(self):
@@ -42,6 +43,7 @@ class Node:
     	self.beta = INF
     	self.children = []
     	self.agent = MAX
+    	self.moves = []
     	self.parent = None
 
     def evaluate(self, color, colorMove):
@@ -79,7 +81,8 @@ class GameTree:
 		k = dep
 		newVal = NINF
 		curr = self.root
-		while self.root.val == NINF and curr != None:
+		bestIndArr = []
+		while self.root.val == NINF:
 			if depth == k:
 				if depth%2 == 1:
 					curr.evaluate(color, color)
@@ -93,15 +96,18 @@ class GameTree:
 
 			if newVal > NINF:
 				if curr.agent == MIN:
-					if newVal < curr.beta and len(curr.children) > 1:
-						curr.beta = newVal
-					elif len(curr.children) == 1:
+					if (newVal < curr.beta and len(curr.children) > 1) or len(curr.children) == 1:
 						curr.beta = newVal
 				else:
-					if newVal > curr.alpha and len(curr.children) > 1:
+					if (newVal >= curr.alpha and len(curr.children) > 1) or len(curr.children) == 1:
+						if curr == self.root:
+							if curr.alpha < newVal:
+								bestIndArr = []
+								bestIndArr.append(len(curr.children) - 1)
+							if curr.alpha == newVal:
+								bestIndArr.append(len(curr.children) - 1)
 						curr.alpha = newVal
-					elif len(curr.children) == 1:
-						curr.alpha = newVal
+						
 				newVal = NINF
 
 			if curr.alpha >= curr.beta:
@@ -116,12 +122,13 @@ class GameTree:
 			else:
 				l = len(curr.children)
 				cboard = copy.deepcopy(curr.game_state)
-				moves = cboard.generateMoveStrings()
-				bf = len(moves)
+				if curr.moves == []:
+					curr.moves = cboard.generateMoveStrings() 
+				bf = len(curr.moves)
 				if l < bf:
-					cboard.makeMove(moves[l])
+					cboard.makeMove(curr.moves[l])
 					game_state = copy.deepcopy(cboard)
-					curr.children.append(Node(curr, 1-curr.agent, game_state))
+					curr.children.append(Node(curr, 1 - curr.agent, game_state))
 					curr = curr.children[l]
 					curr.alpha = curr.parent.alpha
 					curr.beta = curr.parent.beta
@@ -138,7 +145,11 @@ class GameTree:
 					newVal = curr.val
 					curr = curr.parent; depth -= 1
 		print(self.root.val)
-		return self.root.val
+		return self.root.val, bestIndArr
+
+	def traceRootValue(self):
+		bestval = self.root.val
+
 
 class ABAgent:
 	def __init__(self, color):
@@ -157,16 +168,22 @@ class ABAgent:
 		root = Node(None, MAX, cboard)
 
 		self.gt = GameTree(root)
-		val = self.gt.getOptimumValue(depth, self.color)
-		possibleMoves = []
+		val, possibleMoves = self.gt.getOptimumValue(depth, self.color)
 		moveNum = 0
 
-		for i in self.gt.root.children:
-			if val == i.val:
-				possibleMoves.append(moveNum)
-			moveNum += 1
-		moveCnt = 0
-		cnt = 0
+		###checking code
+		# print(len(self.gt.root.children))
+		# print("Game state values:\n")
+		# k = 1
+		# for i in self.gt.root.children:
+		# 	print(str(k)+" Move:")
+		# 	i.game_state.showBoard()
+		# 	print(i.val)
+		# 	print()
+		# 	k = k + 1
+		# print("Game state values over.\n")
+		# input()
+		##end check code
 
 		if len(possibleMoves) == 1:
 			moveCnt = possibleMoves[0]
@@ -174,10 +191,27 @@ class ABAgent:
 			moveCnt = possibleMoves[random.randint(0, len(possibleMoves)-1)]
 
 		for move in legal_moves:
-			if cnt == moveCnt:
+			if moveNum == moveCnt:
 				board.makeMove(move)
-				return
-			cnt += 1
+				return move, val
+			moveNum += 1
+
+	def getTrace(self, maxVal):
+		game_states = []
+		if self.gt.root == None:
+			return []
+
+		curr = self.gt.root
+
+		while True:
+			for gs in curr.children:
+				if gs.val == maxVal:
+					curr = gs
+					print(curr.game_state.board)
+					print()
+					break
+			if len(curr.children) == 0:
+				break
 
 class Play:
 	def __init__(self, board):
@@ -293,9 +327,52 @@ class Play:
 				b = Board()
 				n = int(input("Play again (1/0) :"))
 
+def evaluate(board, color, colorMove):
+	w = 0
+	b = 0
+	dic = {1:1, 2:3, 3:3, 4:5, 5:9, 6:100}
+
+	if board.isCheckMate() and colorMove == color:
+		return MAXV
+	if board.isCheckMate() and colorMove != color:
+		return MINV
+
+	if board.isDraw():
+		return -1
+
+	for i in range(64):
+		if board.board.color_at(i) == True:
+			w = w + dic[board.board.piece_type_at(i)]
+		elif board.board.color_at(i) == False:
+			b = b + dic[board.board.piece_type_at(i)]
+	if color == WHITE:
+		return w - b
+	else:
+		return b - w
+
 # b = Board()
 # B = ABAgent(BLACK)
 # W = ABAgent(WHITE)
 # p = Play(b)
-# p.startGame(W, B)
 
+# # p.startGame(W, B)
+
+# b.showBoard()
+# print()
+# for i in range(30):
+# 	print(b.generateMoveStrings())
+# 	move, maxVal = W.makeMoveUtil(b, 4)
+# 	print("Best move for depth 4 search for white: %s"%(move))
+# 	W.getTrace(maxVal)
+# 	move = input("Enter white move:")
+# 	b.makeMove(move)
+# 	b.showBoard()
+# 	# print(evaluate(b, WHITE, BLACK)); print();
+# 	print(b.generateMoveStrings())
+# 	move, maxVal = B.makeMoveUtil(b, 4)
+# 	print("Best move for depth 4 search for black: %s"%(move))
+# 	B.getTrace(maxVal)
+# 	move = input("Enter black move:")
+# 	b.makeMove(move)
+# 	b.showBoard()
+# 	# print(evaluate(b, BLACK, WHITE)); print()
