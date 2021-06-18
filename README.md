@@ -4,3 +4,7 @@ Two methods for playing chess in this module:
 2. Temporal difference method with states being saved.
 
 Visual display through pygame.
+
+To run this:
+1. pip install numpy python-chess pygame
+2. python GraphicBoard.py
