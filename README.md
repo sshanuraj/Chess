@@ -8,3 +8,6 @@ Visual display through pygame.
 To run this:
 1. pip install numpy python-chess pygame
 2. python GraphicBoard.py
+
+TODO:
+1. Add MCTS for gameplay and tree search, with state values being updated
