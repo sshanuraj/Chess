@@ -3,6 +3,8 @@ import random
 from ChessBoard import Board, chess
 import pickle
 
+#Agent needs a lot change
+
 class Agent:
 	def __init__(self, color, eps, alpha, df):
 		self.color = color
